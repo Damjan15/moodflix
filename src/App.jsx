@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useDebounce } from "react-use";
 
+import { updateSearchCount } from "./appwrite";
+
 import Search from "./components/Search";
 import Spinner from "./components/Spinner";
 import MovieCard from "./components/MovieCard";
@@ -41,7 +43,6 @@ function App() {
       }
 
       const data = await res.json();
-      console.log(data);
 
       if (data.Response === "False") {
         setErrorMessage(data.error || "Failed to fetch movies");
@@ -50,6 +51,10 @@ function App() {
       }
 
       setMovies(data.results);
+
+      if (query && data.results.length > 0) {
+        await updateSearchCount(query, data.results[0]);
+      }
     } catch (error) {
       console.log(`Error fetching movies: ${error}`);
       setErrorMessage("Error fetching movies, please try again later.");
